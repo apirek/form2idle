@@ -88,11 +88,14 @@ class Form2:
 
         # uint_32 payload size
         size = int.from_bytes(await self._reader.read(4), "little")
-        # payload
-        response = Response.from_json(str(await self._reader.read(size), "utf-8"))
-        assert request.Id == response.Id
+        # payload (in chunks up to 1448 bytes)
+        data = bytes()
+        while len(data) < size:
+            data += await self._reader.read(size - len(data))
         # terminator
         assert await self._reader.read(8) == bytes([0x00] * 8)
+        response = Response.from_json(str(data, "utf-8"))
+        assert request.Id == response.Id
         return response
 
     async def get_print_time_remaining(self) -> float:
