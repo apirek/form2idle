@@ -133,9 +133,9 @@ async def main() -> int:
             if args.verbose:
                 if args.eta:
                     eta = now + timedelta(seconds=time_remaining)
-                    print(f"{now:%Y-%m-%d %H:%M:%S}, {eta:%Y-%m-%d %H:%M:%S}")
+                    print(f"{now:%Y-%m-%d %H:%M:%S}, {eta:%Y-%m-%d %H:%M:%S}", flush=True)
                 else:
-                    print(f"{now:%Y-%m-%d %H:%M:%S}, {format_time_remaining(time_remaining)}")
+                    print(f"{now:%Y-%m-%d %H:%M:%S}, {format_time_remaining(time_remaining)}", flush=True)
             if args.wait:
                 try:
                     # Preform polls every 5 seconds
