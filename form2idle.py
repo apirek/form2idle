@@ -99,22 +99,27 @@ class Form2:
         assert request.Id == response.Id
         return response
 
-    async def get_print_time_remaining(self) -> float:
+    async def get_print_time_remaining(self) -> float | None:
         status = (await self._call(Request("PROTOCOL_METHOD_GET_STATUS"))).Parameters
-        if status["isPrinting"] and (print_time_remaining_ms := status["estimatedPrintTimeRemaining_ms"]) > 0:
-            return print_time_remaining_ms / 1000
+        if status["isPrinting"]:
+            return status["estimatedPrintTimeRemaining_ms"] / 1000
         else:
-            return 0.0
+            return None
 
 
 def format_time_remaining(seconds: float) -> str:
+    if seconds < 0:
+        seconds *= -1
+        sign = "-"
+    else:
+        sign = ""
     hours = int(seconds / (60 * 60))
     minutes = int(seconds / 60 % 60)
     seconds = int(seconds % 60)
     if hours:
-        return f"{hours}:{minutes:02}:{seconds:02}"
+        return f"{sign}{hours}:{minutes:02}:{seconds:02}"
     else:
-        return f"{minutes:02}:{seconds:02}"
+        return f"{sign}{minutes:02}:{seconds:02}"
 
 
 async def main() -> int:
@@ -129,7 +134,7 @@ async def main() -> int:
         while True:
             now = datetime.now()
             time_remaining = await form2.get_print_time_remaining()
-            if time_remaining <= 0:
+            if time_remaining is None:
                 return 0
             if args.verbose:
                 if args.eta:
