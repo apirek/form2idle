@@ -44,10 +44,11 @@ class Request:
 @dataclasses.dataclass
 class Response:
     Id: uuid.UUID
-    Parameters: dict
     ReplyToMethod: str
     Success: bool
     Version: int
+    Parameters: dict = None
+    Error: str = None
 
     @classmethod
     def from_json(cls, s: str) -> "Response":
